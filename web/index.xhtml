@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:comp="http://xmlns.jcp.org/jsf/composite/comp"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+   <h:outputText value="Hello, #{shoppingListController.name}, you have #{shoppingListController.shoppingLists.size()} lists:"/>
+   <br />
+   <c:forEach items="#{shoppingListController.shoppingLists}" var="shoppingList">
+      <br/>
+      <div> #{shoppingList.name} from #{shoppingList.source.toString()} </div>
+      <h:form id='#{"form".concat(shoppingList.id)}'>
+         <h:panelGrid columns="4" id="panelGrid_#{shoppingList.id}">
+            <c:forEach items="#{shoppingList.items}" var="item">
+               <h:panelGroup>
+                  <h:outputText value="#{item.id}. " />
+                  <comp:editableField
+                          id="editableField_name_#{shoppingList.id}_#{item.id}"
+                          value="#{item.name}"
+                          editable="#{item.editable}" />
+               </h:panelGroup>
+               <comp:editableField
+                       id="editableField_quantity_#{shoppingList.id}_#{item.id}"
+                       value="#{item.quantity}"
+                       editable="#{item.editable}" />
+               <comp:editableField
+                       id="editableField_unit_#{shoppingList.id}_#{item.id}"
+                       value="#{item.unit}"
+                       editable="#{item.editable}" />
+               <c:if test="#{!item.editable}">
+                  <h:panelGroup>
+                     <h:commandButton value="Edit" actionListener="#{shoppingListController.makeEditable(item)}" >
+                        <f:ajax
+                                execute="editableField_name_#{shoppingList.id}_#{item.id} editableField_quantity_#{shoppingList.id}_#{item.id} editableField_unit_#{shoppingList.id}_#{item.id}"
+                                render="editableField_name_#{shoppingList.id}_#{item.id} editableField_quantity_#{shoppingList.id}_#{item.id} editableField_unit_#{shoppingList.id}_#{item.id}" />
+                     </h:commandButton>
+                     <h:commandButton value="X"  action="#{shoppingListController.removeItem(shoppingList, item)}" />
+                  </h:panelGroup>
+               </c:if>
+               <c:if test="#{item.editable}">
+                  <c:if test="#{item.id lt 0}">
+                      <h:commandButton value="Add" action="#{shoppingListController.addItem(shoppingList, item)}" />
+                  </c:if>
+                  <c:if test="#{item.id ge 0}">
+                     <h:panelGroup>
+                        <h:commandButton value="Update" action="#{shoppingListController.updateItem(shoppingList, item)}" />
+                        <h:commandButton value="X"  action="#{shoppingListController.removeItem(shoppingList, item)}" />
+                     </h:panelGroup>
+                  </c:if>
+               </c:if>
+            </c:forEach>
+         </h:panelGrid>
+      </h:form>
+   </c:forEach>
+
+</html>
