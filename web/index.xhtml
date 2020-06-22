@@ -12,8 +12,31 @@
    <br />
    <c:forEach items="#{shoppingListController.shoppingLists}" var="shoppingList">
       <br/>
-      <div> #{shoppingList.name} from #{shoppingList.source.toString()} </div>
-      <h:form id='#{"form".concat(shoppingList.id)}'>
+      <h:form id="form_#{shoppingList.id}">
+         <div id="listHeader_#{shoppingList.id}">
+            <c:if test="#{shoppingList.headerEditable}">
+               <div>
+                  <h:inputText value="#{shoppingList.name}" />
+                  <h:selectOneRadio value="#{shoppingList.source.type}">
+                     <f:selectItem itemValue="book_source" itemLabel="Book"/>
+                     <f:selectItem itemValue="webpage_source" itemLabel="Web page" />
+                     <f:selectItem itemValue="no_source" itemLabel="No source" />
+                  </h:selectOneRadio>
+                  <c:if test="#{shoppingList.source.type == shoppingList.}" >
+                     <h:inputText value="#{shoppingList.source.bookAuthor}" />
+                     <h:inputText value="#{shoppingList.source.bookTitle}" />
+                     <h:inputText value="#{shoppingList.source.bookPage}" />
+                  </c:if>
+                  <h:commandButton value="Update" action="#{shoppingListController.updateHeader(shoppingList)}" />
+               </div>
+            </c:if>
+            <c:if test="#{!shoppingList.headerEditable}">
+               <div> #{shoppingList.name} from #{shoppingList.source.toString()} </div>
+               <h:commandButton value="Edit" actionListener="#{shoppingListController.makeHeaderEditable(shoppingList)}">
+                  <f:ajax execute="listHeader_#{shoppingList.id}" render="listHeader_#{shoppingList.id}" />
+               </h:commandButton>
+            </c:if>
+         </div>
          <h:panelGrid columns="4" id="panelGrid_#{shoppingList.id}">
             <c:forEach items="#{shoppingList.items}" var="item">
                <h:panelGroup>

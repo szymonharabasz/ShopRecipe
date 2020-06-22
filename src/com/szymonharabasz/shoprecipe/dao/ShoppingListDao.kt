@@ -9,5 +9,6 @@ interface ShoppingListDao {
     fun addItem(listId: String, item: ListItemEntity)
     fun getShoppingLists(): List<ShoppingListEntity>
     fun removeItem(listId: String, itemId: Long): Unit
-    fun updateItem(listId: String, item: ListItem)
+    fun updateItem(listId: String, item: ListItemEntity)
+    fun updateList(list: ShoppingListEntity)
 }

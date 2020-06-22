@@ -1,15 +1,15 @@
 package com.szymonharabasz.shoprecipe.dao
 
-import com.szymonharabasz.shoprecipe.entities.BookSource
+import com.szymonharabasz.shoprecipe.entities.BookSourceEntity
 import com.szymonharabasz.shoprecipe.entities.ListItemEntity
 import com.szymonharabasz.shoprecipe.entities.ShoppingListEntity
-import com.szymonharabasz.shoprecipe.viewmodel.ListItem
 import java.util.*
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Named
 
 @Named
 @ApplicationScoped
+@InMemoryRepository
 open class ShoppingListFakeDao : ShoppingListDao {
     private var shoppingLists: List<ShoppingListEntity> = listOf(
             ShoppingListEntity(
@@ -22,7 +22,7 @@ open class ShoppingListFakeDao : ShoppingListDao {
                             ListItemEntity(3, "Kleine reife Rispentomaten", 400.0, "g"),
                             ListItemEntity(4, "Grüne Bohnen", 400.0, "g")
                     ),
-                    BookSource("Jamie Oliver", "Jamies 5 Zutaten Küche", 114)
+                    BookSourceEntity("Jamie Oliver", "Jamies 5 Zutaten Küche", 114)
             ),
             ShoppingListEntity(
                     "2",
@@ -39,7 +39,7 @@ open class ShoppingListFakeDao : ShoppingListDao {
                             ListItemEntity(13, "Cornflour (cornstarch)", 5.0, "ml"),
                             ListItemEntity(14, "Spring onion (scallion), chopped", 1.0, "")
                     ),
-                    BookSource("Terry Tan", "The food and cooking of Shanghai and East China", 77)
+                    BookSourceEntity("Terry Tan", "The food and cooking of Shanghai and East China", 77)
             )
     )
     private var usedIds: SortedSet<Long> = shoppingLists.flatMap { shopingListEntity ->
@@ -55,7 +55,7 @@ open class ShoppingListFakeDao : ShoppingListDao {
     override fun addItem(listId: String, item: ListItemEntity): Unit {
         shoppingLists = shoppingLists.map { shoppingList ->
             if (shoppingList.id == listId)
-                ShoppingListEntity(listId, shoppingList.name, shoppingList.items + item, shoppingList.source)
+                ShoppingListEntity(listId, shoppingList.name, shoppingList.items + item, shoppingList.sourceEntity)
             else
                 shoppingList
         }
@@ -70,14 +70,14 @@ open class ShoppingListFakeDao : ShoppingListDao {
                         listId,
                         shoppingList.name,
                         shoppingList.items.filter { it.id != itemId },
-                        shoppingList.source
+                        shoppingList.sourceEntity
                 )
             else
                 shoppingList
         }
     }
 
-    override fun updateItem(listId: String, item: ListItem) {
+    override fun updateItem(listId: String, item: ListItemEntity) {
         shoppingLists = shoppingLists.map { shoppingList ->
             if (shoppingList.id == listId)
                 ShoppingListEntity(
@@ -85,14 +85,23 @@ open class ShoppingListFakeDao : ShoppingListDao {
                         shoppingList.name,
                         shoppingList.items.map {listItemEntity ->
                             if (listItemEntity.id == item.id)
-                                ListItemEntity(item.id, item.name, item.quantity, item.unit)
+                                item
                             else
                                 listItemEntity
                         },
-                        shoppingList.source
+                        shoppingList.sourceEntity
                 )
             else
                 shoppingList
+        }
+    }
+
+    override fun updateList(list: ShoppingListEntity) {
+        shoppingLists = shoppingLists.map { shoppingListEntity ->
+            if (shoppingListEntity.id == list.id)
+                list
+            else
+                shoppingListEntity
         }
     }
 }

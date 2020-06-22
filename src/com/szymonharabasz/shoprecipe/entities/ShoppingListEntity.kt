@@ -6,6 +6,6 @@ class ShoppingListEntity(
         val id: String,
         val name: String,
         val items: List<ListItemEntity>,
-        val source: ShoppingListSource
+        val sourceEntity: ShoppingListSourceEntity
 ) : Serializable {
 }
